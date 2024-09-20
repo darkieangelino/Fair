@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test bot for Fair tool</title>
+</head>
+<body>
+    <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
+    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+
+    <df-messenger
+      location="us-central1"
+      project-id="mgmt-bps-automn-12"
+      agent-id="b31d66c0-116d-4847-91b1-2cfdcc58d277"
+      language-code="en"
+      max-query-length="-1">
+      <df-messenger-chat-bubble
+       chat-title="Grievance HR bot">
+      </df-messenger-chat-bubble>
+    </df-messenger>
+
+    <style>
+      df-messenger {
+        z-index: 999;
+        position: fixed;
+        --df-messenger-font-color: #000;
+        --df-messenger-font-family: Google Sans;
+        --df-messenger-chat-background: #f3f6fc;
+        --df-messenger-message-user-background: #d3e3fd;
+        --df-messenger-message-bot-background: #fff;
+        bottom: 16px;
+        right: 16px;
+      }
+    </style>
+
+    <script>
+      let inactivityTimeout;
+      const timeoutDuration = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+      // Function to clear the inactivity timeout and reset it
+      function resetInactivityTimeout() {
+        clearTimeout(inactivityTimeout); // Clear previous timeout if any
+        inactivityTimeout = setTimeout(() => {
+          endSession();
+        }, timeoutDuration); // Set new timeout for 5 minutes
+      }
+
+      // Function to reset the chatbot session
+      function endSession() {
+        const dfMessenger = document.querySelector('df-messenger');
+        // Reset the bot chat by removing and re-adding the iframe
+        const botContainer = dfMessenger.shadowRoot.querySelector('iframe');
+        botContainer.src = botContainer.src; // Reset iframe source to restart session
+        console.log("Session ended due to inactivity.");
+      }
+
+      // Add event listener to monitor user interaction
+      document.addEventListener('click', resetInactivityTimeout);
+      document.addEventListener('keydown', resetInactivityTimeout);
+
+      // Initially set the inactivity timeout
+      resetInactivityTimeout();
+    </script>
+</body>
+</html>

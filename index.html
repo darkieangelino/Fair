@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .login-container label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .login-container input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    .login-container button {
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .login-container button:hover {
+      background-color: #218838;
+    }
+    .login-container .error, .login-container .success {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .login-container .error {
+      color: red;
+    }
+    .login-container .success {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label for="employeeID">Employee ID:</label>
+      <input type="text" id="employeeID" name="employeeID" required>
+
+      <label for="lanId">LAN ID:</label>
+      <input type="text" id="lanId" name="lanId" required>
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">Login</button>
+      <div class="error" id="error"></div>
+      <div class="success" id="success"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      // Clear previous messages
+      document.getElementById('error').innerText = '';
+      document.getElementById('success').innerText = '';
+
+      // Get form data
+      const employeeID = document.getElementById('employeeID').value;
+      const lanId = document.getElementById('lanId').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        // Send the login data to the server
+        const response = await fetch('https://us-central1-mgmt-bps-automn-12.cloudfunctions.net/fairtoolv1/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ employeeID, lanId, password })
+        });
+
+        const result = await response.json();
+
+        // Check if the responseCode is 200
+        if (result.responseCode === 200) {
+          // Store tokens and user data if needed (optional)
+          localStorage.setItem('token', result.token);
+          localStorage.setItem('refreshToken', result.refreshToken);
+          localStorage.setItem('userRole', result.userRole);
+          localStorage.setItem('email', result.email);
+          localStorage.setItem('displayName', result.displayName);
+
+          // Redirect to index1.html
+          window.location.href = 'index1.html';
+        } else {
+          // Handle login failure
+          document.getElementById('error').innerText = 'Login failed: ' + (result.message || 'Invalid credentials');
+        }
+      } catch (error) {
+        // Handle network or other errors
+        document.getElementById('error').innerText = 'Error occurred: ' + error.message;
+      }
+    });
+  </script>
+
+</body>
+</html>
